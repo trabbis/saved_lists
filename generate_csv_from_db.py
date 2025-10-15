@@ -274,7 +274,7 @@ def fetch_from_postgres(host: str, port: int, dbname: str, user: str, max_lists:
 
         FROM items i
 
-        LEFT JOIN item_lists il ON il.item_id = i.id
+        INNER JOIN item_lists il ON il.item_id = i.id
 
     """
 
@@ -444,7 +444,7 @@ def normalize_list_row(r: Dict[str, Any]) -> Dict[str, Any]:
 
     return {
 
-        "list_id": to_int_or_zero(r.get("list_id")),
+        "list_id": r.get("list_id"),
 
         "borrower_id": to_int_or_zero(r.get("borrower_id")),
 
@@ -466,7 +466,7 @@ def normalize_item_row(r: Dict[str, Any]) -> Dict[str, Any]:
 
     return {
 
-        "list_id": to_int_or_zero(r.get("list_id")) if r.get("list_id") is not None else "",
+        "list_id": r.get("list_id") if r.get("list_id") is not None else "",
 
         "bib_id": "" if r.get("bib_id") is None else str(r.get("bib_id")),
 
@@ -504,6 +504,8 @@ def split_and_write_lists_and_items(lists_in: List[Dict[str, Any]],
 
                                    max_lists: Optional[int] = None) -> int:
 
+    print(f"parameters list... {len(lists_in)} & items {len(items_in)} & chunk size {chunk_size} for testing...")
+
     # Apply max_lists limit if set
 
     if max_lists is not None:
@@ -522,6 +524,7 @@ def split_and_write_lists_and_items(lists_in: List[Dict[str, Any]],
 
     for lst in lists_in:
 
+        #print("DEBUG lists:", lst)
         borrower_id = lst.get("borrower_id")
 
         if borrower_id is not None:
@@ -542,6 +545,7 @@ def split_and_write_lists_and_items(lists_in: List[Dict[str, Any]],
 
     for it in items_in:
 
+        #print("DEBUG items:", it)
         lid = it.get("list_id")
 
         if lid == "" or lid is None or lid == 0:
@@ -768,7 +772,7 @@ def split_and_write_lists_and_items(lists_in: List[Dict[str, Any]],
 
                         ])
 
-                print(f"    Wrote {len(chunk)} items to {no_list_csv}")
+                print(f"    Wrote {len(chunk)} no_list_items to {no_list_csv}")
 
             total_chunks += len(chunked_no_list)
 
@@ -948,11 +952,11 @@ def main():
 
     print(f"Output directory contents after run:")
 
-    for root, dirs, files in os.walk(abs_out_dir):
+    #for root, dirs, files in os.walk(abs_out_dir):
 
-        for name in files:
+    #    for name in files:
 
-            print(f"  {os.path.join(root, name)}")
+            #print(f"  {os.path.join(root, name)}")
 
     print("Done.")
 
