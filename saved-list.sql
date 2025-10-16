@@ -38,6 +38,8 @@ SELECT
 	FROM public.items i --taking 3 mins
 	LEFT JOIN item_lists il on i.id = il.item_id
 	LEFT JOIN lists l on l.id = il.list_id
+    WHERE MOD( ('x'||SUBSTR(MD5(i.record_id::text),1,8))::bit(32)::int, 6 ) = 0; -- 0..5
+
 --	WHERE i.user_id = '4824671'  --Doug
 --ORDER BY i.id ASC LIMIT 100
 
