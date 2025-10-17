@@ -39,7 +39,8 @@ SELECT  --64,243
    	id AS list_id,
    	user_id AS borrower_id,
    	REGEXP_REPLACE(name, '[,\\s]+', ' ', 'g') AS name,
-	CASE WHEN description IS NULL THEN '' ELSE description END,
+	REGEXP_REPLACE(
+	    REPLACE(description, U&'\200B', ''), E'[\r\n]+', ' ', 'g') AS description,
    	created_at AS date_created,
    	modified_at AS date_updated,
 	CASE WHEN share_token IS NOT NULL THEN 1 ELSE 0 END AS public_list
@@ -47,6 +48,7 @@ SELECT  --64,243
 FROM public.lists
 --LIMIT 100
 
+	
 	
 
 
