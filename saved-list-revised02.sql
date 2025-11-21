@@ -57,8 +57,8 @@ SELECT  --64,243 -->64,747
    	REGEXP_REPLACE(name, '[,\\s]+', ' ', 'g') AS name,
 	REGEXP_REPLACE(
 	    REPLACE(description, U&'\200B', ''), E'[\r\n]+', ' ', 'g') AS description,
-   	created_at AS date_created,
-   	modified_at AS date_updated,
+    TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI:SS') AS date_created,
+	TO_CHAR(modified_at, 'YYYY-MM-DD HH24:MI:SS') AS date_updated,
 	CASE WHEN share_token IS NOT NULL THEN 1 ELSE 0 END AS public_list
 
 FROM public.lists
@@ -86,6 +86,13 @@ SELECT count(*)   --6,131,103
 	FROM public.items i
 	LEFT JOIN item_lists il on i.id = il.item_id
 	LEFT JOIN lists l on l.id = il.list_id
+
+SELECT list_id, count(*)
+	FROM public.items i
+	LEFT JOIN item_lists il on i.id = il.item_id
+	LEFT JOIN lists l on l.id = il.list_id
+	WHERE list_id is not null
+	group by list_id
 */	
 
 
@@ -94,12 +101,14 @@ SELECT  --6,129,180 --> 6,204,933
 	il.list_id AS list_id,
 --    i.user_id AS borrower_id,
     i.record_id AS bib_id,
-    i.created_at AS date_added
+    TO_CHAR(i.created_at, 'YYYY-MM-DD HH24:MI:SS') AS date_added
 --            i.id AS item_id,
 --	l.*, i.* 
  	FROM public.items i --taking 3 mins --> now around 20 secs -->53 sec
 	LEFT JOIN item_lists il on i.id = il.item_id
 	LEFT JOIN lists l on l.id = il.list_id
+
+	WHERE list_id is not null  --1,203,303
 	
 --WHERE MOD( ('x'||SUBSTR(MD5(i.record_id::text),1,8))::bit(32)::int, 6 ) = 5; -- 0..5
 
